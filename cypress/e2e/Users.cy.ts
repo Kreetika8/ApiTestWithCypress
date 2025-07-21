@@ -1,29 +1,23 @@
-import { faker } from '@faker-js/faker';
-
+import { fakePostData, fakeUserData } from '../data/userData'; 
 
 describe('Users Module', () => {
   it('TC01 - Create User Valid', () => {
+    const userPayload = fakeUserData()
 
-    const userData = {
-      name: faker.person.fullName(),
-      gender: faker.person.sex(),
-      email: faker.internet.email(),
-      status: faker.helpers.arrayElement(['active', 'inactive']),
-    }
     cy.request({
       method: 'POST',
       url: '/users',
       headers: {
         Authorization: `Bearer ${Cypress.env('apiToken')}`,
       },
-      body: userData
+      body: userPayload
     }).then((response) => {
       expect(response.status).to.eq(201);
       expect(response.body).to.include({
-        name: userData.name,
-        gender: userData.gender,
-        email: userData.email,
-        status: userData.status
+        name: userPayload.name,
+        gender: userPayload.gender,
+        email: userPayload.email,
+        status: userPayload.status
       })
     });
   });
@@ -152,21 +146,14 @@ describe('Users Module', () => {
   });
 
   it('TC07 - Delete a user by ID', () => {
-    //create user
-    const userData = {
-      name: 'Delete Test User',
-      gender: 'female',
-      email: `delete${Date.now()}@gmail.com`,
-      status: 'active',
-    };
-
     cy.request({
       method: 'POST',
       url: '/users',
       headers: {
         Authorization: `Bearer ${Cypress.env('apiToken')}`,
       },
-      body: userData,
+      body: fakeUserData()
+,
     }).then((createResponse) => {
       expect(createResponse.status).to.eq(201);
 
@@ -285,17 +272,11 @@ describe('Users Module', () => {
   });
 
 
-  it.only('TC12 - Create User Without Token', () => {
-    const userData = {
-      name: faker.person.fullName(),
-      gender: faker.person.sex(),
-      email: faker.internet.email(),
-      status: faker.helpers.arrayElement(['active', 'inactive']),
-    }
+  it('TC12 - Create User Without Token', () => {
     cy.request({
       method: 'POST',
       url: '/users',
-      body: userData,
+      body:fakeUserData(),
       failOnStatusCode: false
     }).then((response) => {
       expect(response.status).to.eq(401);
